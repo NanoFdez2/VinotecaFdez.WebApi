@@ -1,0 +1,6 @@
+@VinotecaFernandez.WebApi_HostAddress = http://localhost:5214
+
+GET {{VinotecaFernandez.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
