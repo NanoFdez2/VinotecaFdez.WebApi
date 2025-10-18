@@ -66,7 +66,10 @@ namespace VinotecaFernandez.WebApi.Controllers
             if (provincia is null)
                 return NotFound();
 
-            provincia = _mapper.Map<Provincia>(provinciaRequestDto);
+            Provincia aux = new Provincia();
+            aux = aux.devolverProvincia(provinciaRequestDto);
+
+            provincia = _mapper.Map<Provincia>(aux);
             _provincia.Save(provincia);
             return Ok();
         }
