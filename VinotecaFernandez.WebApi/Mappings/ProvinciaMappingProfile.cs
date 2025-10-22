@@ -9,7 +9,7 @@ namespace VinotecaFernandez.WebApi.Mappings
         public ProvinciaMappingProfile()
         {
             CreateMap<Provincia, ProvinciaResponseDto>();
-            CreateMap<ProvinciaResponseDto, Provincia>();
+            CreateMap<ProvinciaRequestDto, Provincia>();
         }
     }
 }

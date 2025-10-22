@@ -47,10 +47,8 @@ namespace VinotecaFernandez.WebApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            Provincia aux = new Provincia();
-            aux = aux.devolverProvincia(provinciaRequestDto);
 
-            Provincia provincia = _mapper.Map<Provincia>(aux);
+            Provincia provincia = _mapper.Map<Provincia>(provinciaRequestDto);
             _provincia.Save(provincia);
             return Ok(provincia.Id);
         }
