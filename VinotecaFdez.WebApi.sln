@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinotecaFernandez.WebApi", "VinotecaFernandez.WebApi\VinotecaFernandez.WebApi.csproj", "{E736C4A4-108C-4810-927C-0843018FAED6}"
 EndProject
@@ -14,8 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinoteca.Entities", "Vinoteca.Entities\Vinoteca.Entities.csproj", "{304C706E-704D-422F-99BE-B2D85019E9F7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinoteca.Enums", "Vinoteca.Enums\Vinoteca.Enums.csproj", "{946A47E6-32C4-416B-80BA-92E7CC703F2B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinoteca.Proyects", "Vinoteca.Proyects\Vinoteca.Proyects.csproj", "{5160EA83-1C32-4DD6-997C-976840A308A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vinoteca.Repositories", "Vinoteca.Repositories\Vinoteca.Repositories.csproj", "{10C05722-B1B0-4C65-9D96-95C5C87C7E5A}"
 EndProject
@@ -51,10 +49,6 @@ Global
 		{946A47E6-32C4-416B-80BA-92E7CC703F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{946A47E6-32C4-416B-80BA-92E7CC703F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{946A47E6-32C4-416B-80BA-92E7CC703F2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5160EA83-1C32-4DD6-997C-976840A308A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5160EA83-1C32-4DD6-997C-976840A308A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5160EA83-1C32-4DD6-997C-976840A308A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5160EA83-1C32-4DD6-997C-976840A308A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{10C05722-B1B0-4C65-9D96-95C5C87C7E5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{10C05722-B1B0-4C65-9D96-95C5C87C7E5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10C05722-B1B0-4C65-9D96-95C5C87C7E5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
