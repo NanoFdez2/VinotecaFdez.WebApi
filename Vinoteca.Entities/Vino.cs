@@ -9,7 +9,7 @@ using Vinoteca.Abstractions;
 
 namespace Vinoteca.Entities
 {
-    public class Vino : IEntidad
+    public class Vino : IEntidad, IClassMethods
     {
         public Vino()
         {
@@ -30,5 +30,16 @@ namespace Vinoteca.Entities
         public virtual ICollection<BodegasPorProvincias> BodegasPorProvincias { get; set; }
         public virtual ICollection<VinosPorBodegas> VinosPorBodegas { get; set; }
         public virtual ICollection<VinosVariedades> VinosVariedades { get; set; }
+
+        public void SetNombre(string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+                throw new ArgumentException("El nombre del vino no puede estar vacío.");
+            Nombre = nombre;
+        }
+        public string GetClassName()
+        {
+            return string.Join(": ", this.GetType().BaseType.Name, Nombre);
+        }
     }
 }

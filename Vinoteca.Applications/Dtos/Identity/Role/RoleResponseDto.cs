@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vinoteca.Applications.Dtos.Role
+namespace Vinoteca.Applications.Dtos.Identity.Role
 {
     public class RoleResponseDto
     {

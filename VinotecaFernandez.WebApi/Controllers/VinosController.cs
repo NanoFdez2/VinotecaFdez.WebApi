@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Vinoteca.Entities;
+using Vinoteca.Entities.MicrosoftIdentity;
 using Vinoteca.Services;
 
 namespace VinotecaFernandez.WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class VinosController : ControllerBase
@@ -16,13 +22,16 @@ namespace VinotecaFernandez.WebApi.Controllers
             new Vino { Id = 3, Nombre = "Rosado Melvoú", BodegaId = 3, Anio = 2021 },
             new Vino { Id = 4, Nombre = "Chagdone Setenier", BodegaId = 4, Anio = 2016 }
         };
+
         private readonly ILogger<VinosController> _logger;
         private readonly IStringServices _stringServices;
+        private readonly IMapper _mapper;
 
-        public VinosController(ILogger<VinosController> logger, IStringServices stringServices)
+        public VinosController(ILogger<VinosController> logger, IStringServices stringServices, IMapper mapper)
         {
             _logger = logger;
             _stringServices = stringServices;
+            _mapper = mapper;
         }
 
         [HttpGet]

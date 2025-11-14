@@ -17,7 +17,7 @@ namespace Vinoteca.Entities.MicrosoftIdentity
         [Required(ErrorMessage = "{0} Required")]
         [StringLength(100)]
         [PersonalData]
-        public string Apellidos { get; set; }
+        public string Apellidos { get; set; } 
         [DataType(DataType.Date)]
         public DateTime? FechaNacimiento { get; set; }
 
