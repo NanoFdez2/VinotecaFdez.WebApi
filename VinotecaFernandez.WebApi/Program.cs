@@ -26,9 +26,9 @@ namespace VinotecaFernandez.WebApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Biblioteca.WebApi", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "VinotecaFernandez.WebApi", Version = "v1" });
 
-                //var filePath = Path.Combine(System.AppContext.BaseDirectory, "NutricionProfesional.WebApi.xml");
+                //var filePath = Path.Combine(System.AppContext.BaseDirectory, "¿¿¿¿NutricionProfesional????.WebApi.xml");
                 //c.IncludeXmlComments(filePath);
                 
                 var jwtSecurityScheme = new OpenApiSecurityScheme
@@ -52,7 +52,7 @@ namespace VinotecaFernandez.WebApi
             builder.Services.AddDbContext<DbDataAccess>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-                        o => o.MigrationsAssembly("VinotecaFdez.WebApi"));
+                        o => o.MigrationsAssembly("VinotecaFernandez.WebApi"));
                 options.UseLazyLoadingProxies();
             });
             builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
@@ -89,7 +89,6 @@ namespace VinotecaFernandez.WebApi
             builder.Services.AddScoped(typeof(IApplication<>), typeof(Application<>));
             builder.Services.AddScoped(typeof(IDbContext<>), typeof(DbContext<>));
             builder.Services.AddScoped(typeof(ITokenHandlerService), typeof(TokenHandlerService));
-
 
 
 

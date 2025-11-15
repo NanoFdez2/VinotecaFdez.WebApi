@@ -1,5 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Vinoteca.Abstractions;
+using Vinoteca.Entities;
 
 namespace Vinoteca.DataAccess
 {
@@ -32,16 +36,33 @@ namespace Vinoteca.DataAccess
 
         public T Save(T entity)
         {
-            if (entity.Id.Equals(0))
+            if (entity is null)
+                throw new ArgumentNullException(nameof(entity));
+
+            // Nuevo comportamiento: usar comparación directa con 0 y manejar el caso en
+            // que la entidad con ese Id no exista en la BD (evitar pasar null a Entry).
+            if (entity.Id == 0)
             {
                 _Items.Add(entity);
             }
             else
             {
                 var entityDb = GetById(entity.Id);
-                _ctx.Entry(entityDb).State = EntityState.Detached;
-                _Items.Update(entity);
+
+                if (entityDb == null)
+                {
+                    // Si no existe en la BD, tratamos como inserción.
+                    // Alternativa: lanzar excepción si prefieres forzar actualización solo cuando exista.
+                    _Items.Add(entity);
+                }
+                else
+                {
+                    // Desadherir la entidad cargada y actualizar con la enviada
+                    _ctx.Entry(entityDb).State = EntityState.Detached;
+                    _Items.Update(entity);
+                }
             }
+
             _ctx.SaveChanges();
             return entity;
         }

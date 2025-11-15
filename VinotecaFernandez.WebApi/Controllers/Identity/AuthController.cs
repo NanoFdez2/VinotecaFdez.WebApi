@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Vinoteca.Applications.Dtos.Identity.User;
 using Vinoteca.Applications.Dtos.Login;
@@ -49,8 +47,6 @@ namespace VinotecaFernandez.WebApi.Controllers.Identity
                 }, user.Password);
                 if (Creado.Succeeded)
                 {
-                    var userBack = _userManager.FindByEmailAsync(user.Email);
-                    _ = _userManager.AddToRoleAsync(userBack.Result, "Administrador");
                     return Ok(new UserRegistroResponseDto
                     {
                         NombreCompleto = string.Join(" ", user.Nombres, user.Apellidos),
@@ -123,12 +119,14 @@ namespace VinotecaFernandez.WebApi.Controllers.Identity
                     {
                         try
                         {
+                            var roles = await _userManager.GetRolesAsync(existeUsuario);
                             var parametros = new TokenParameters()
                             {
                                 Id = existeUsuario.Id.ToString(),
                                 PaswordHash = existeUsuario.PasswordHash,
                                 UserName = existeUsuario.UserName,
-                                Email = existeUsuario.Email
+                                Email = existeUsuario.Email,
+                                Roles = roles
                             };
                             var jwt = _servicioToken.GenerateJwtTokens(parametros);
                             return Ok(new LoginUserResponseDto()

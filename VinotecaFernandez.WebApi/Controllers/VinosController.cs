@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using Vinoteca.Applications;
+using Vinoteca.Applications.Dtos.Vino;
+using Vinoteca.Applications.Dtos.Bodega;
+using Vinoteca.Applications.Dtos.Variedad;
 using Vinoteca.Entities;
 using Vinoteca.Entities.MicrosoftIdentity;
-using Vinoteca.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace VinotecaFernandez.WebApi.Controllers
 {
@@ -15,75 +18,94 @@ namespace VinotecaFernandez.WebApi.Controllers
     [ApiController]
     public class VinosController : ControllerBase
     {
-        private static readonly List<Vino> vinos = new List<Vino>
-        {
-            new Vino { Id = 1, Nombre = "Malbec Shuano", BodegaId = 1, Anio = 2020 },
-            new Vino { Id = 2, Nombre = "Cabernet Sauvignon", BodegaId = 2, Anio = 2019 },
-            new Vino { Id = 3, Nombre = "Rosado Melvoú", BodegaId = 3, Anio = 2021 },
-            new Vino { Id = 4, Nombre = "Chagdone Setenier", BodegaId = 4, Anio = 2016 }
-        };
-
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<VinosController> _logger;
-        private readonly IStringServices _stringServices;
+        private readonly IApplication<Vino> _vino;
         private readonly IMapper _mapper;
 
-        public VinosController(ILogger<VinosController> logger, IStringServices stringServices, IMapper mapper)
+        public VinosController(ILogger<VinosController> logger, UserManager<User> userManager, IApplication<Vino> vino, IMapper mapper)
         {
             _logger = logger;
-            _stringServices = stringServices;
+            _userManager = userManager;
+            _vino = vino;
             _mapper = mapper;
         }
 
         [HttpGet]
         [Route("All")]
+        [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> All()
         {
-            return Ok(vinos);
+            var id = User.FindFirst("Id").Value.ToString();
+            var user = _userManager.FindByIdAsync(id).Result;
+            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                await _userManager.IsInRoleAsync(user, "Cliente"))
+            {
+                var name = User.FindFirst("name");
+                var a = User.Claims;
+                return Ok(_mapper.Map<IList<VinoResponseDto>>(_vino.GetAll()));
+            }
+            return Unauthorized();
         }
 
         [HttpGet]
         [Route("ById")]
+        [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> ById(int? Id)
         {
-            Vino vino = vinos.FirstOrDefault(l => l.Id == Id);
-            if (vino is null)
+            if (!Id.HasValue)
+                return BadRequest("Debe especificar un Id.");
+
+            var idUser = User.FindFirst("Id")?.Value;
+            var user = await _userManager.FindByIdAsync(idUser);
+
+            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                await _userManager.IsInRoleAsync(user, "Cliente"))
             {
-                return NotFound();
+                var vino = _vino.GetById(Id.Value);
+
+                if (vino is null)
+                    return NotFound("Vino no encontrado.");
+
+                return Ok(_mapper.Map<VinoResponseDto>(vino));
             }
-            return Ok(vino);
+
+            return Unauthorized();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(Vino vino)
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Crear(VinoRequestDto vinoRequestDto)
         {
-            vino.Id = 5;
-            vinos.Add(vino);
-            //return Created();
-            return Ok(vino);
+            if (!ModelState.IsValid) return BadRequest();
+            var vino = _mapper.Map<Vino>(vinoRequestDto);
+            _vino.Save(vino);
+            return Ok(vino.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, string nombre, int bodega)
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Editar(int? Id, VinoRequestDto vinoRequestDto)
         {
-            Vino vino = vinos.FirstOrDefault(l => l.Id == Id);
-            if (vino is null)
-            {
-                return NotFound();
-            }
-            vino.Nombre = nombre;
-            vino.BodegaId = bodega;
-            return Ok(vino);
+            if (!Id.HasValue) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
+            Vino vinoBack = _vino.GetById(Id.Value);
+            if (vinoBack is null) return NotFound();
+
+            vinoBack = _mapper.Map<Vino>(vinoRequestDto);
+            _vino.Save(vinoBack);
+            return Ok(vinoBack);
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Borrar(int? Id)
         {
-            Vino vino = vinos.FirstOrDefault(l => l.Id == Id);
-            if (vino is null)
-            {
-                return NotFound();
-            }
-            vinos.Remove(vino);
+            if (!Id.HasValue) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest();
+            Vino vinoBack = _vino.GetById(Id.Value);
+            if (vinoBack is null) return NotFound();
+            _vino.Delete(vinoBack.Id);
             return Ok();
         }
     }

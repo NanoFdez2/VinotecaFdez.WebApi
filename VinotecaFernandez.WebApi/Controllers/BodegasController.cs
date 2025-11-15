@@ -31,11 +31,13 @@ namespace VinotecaFernandez.WebApi.Controllers
 
         [HttpGet]
         [Route("All")]
+        [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> All()
         {
             var id = User.FindFirst("Id").Value.ToString();
             var user = _userManager.FindByIdAsync(id).Result;
-            if (_userManager.IsInRoleAsync(user, "Administrador").Result)
+            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                await _userManager.IsInRoleAsync(user, "Cliente"))
             {
                 var name = User.FindFirst("name");
                 var a = User.Claims;
@@ -46,21 +48,30 @@ namespace VinotecaFernandez.WebApi.Controllers
 
         [HttpGet]
         [Route("ById")]
+        [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> ById(int? Id)
         {
             if (!Id.HasValue)
+                return BadRequest("Debe especificar un Id.");
+            var idUser = User.FindFirst("Id")?.Value;
+            var user = await _userManager.FindByIdAsync(idUser);
+
+            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                await _userManager.IsInRoleAsync(user, "Cliente"))
             {
-                return BadRequest();
+                var bodega = _bodega.GetById(Id.Value);
+
+                if (bodega is null)
+                    return NotFound("Bodega no encontrada.");
+
+                return Ok(_mapper.Map<BodegaResponseDto>(bodega));
             }
-            Bodega bodega = _bodega.GetById(Id.Value);
-            if (bodega is null)
-            {
-                return NotFound();
-            }
-            return Ok(_mapper.Map<BodegaResponseDto>(bodega));
+
+            return Unauthorized();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear(BodegaRequestDto bodegaRequestDto)
         {
             if (!ModelState.IsValid)
@@ -71,31 +82,33 @@ namespace VinotecaFernandez.WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Editar(int? Id, BodegaRequestDto bodegaRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var bodega = _bodega.GetById(Id.Value);
-            if (bodega is null)
+            var bodegaBack = _bodega.GetById(Id.Value);
+            if (bodegaBack is null)
             { return NotFound(); }
-            bodega = _mapper.Map<Bodega>(bodegaRequestDto);
-            _bodega.Save(bodega);
+            bodegaBack = _mapper.Map<Bodega>(bodegaRequestDto);
+            _bodega.Save(bodegaBack);
             return Ok();
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Borrar(int? Id)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var bodega = _bodega.GetById(Id.Value);
-            if (bodega is null)
+            var bodegaBack = _bodega.GetById(Id.Value);
+            if (bodegaBack is null)
             { return NotFound(); }
-            _bodega.Delete(bodega.Id);
+            _bodega.Delete(bodegaBack.Id);
             return Ok();
         }
     }

@@ -44,6 +44,7 @@ namespace VinotecaFernandez.WebApi.Controllers.Identity
                 try
                 {
                     var role = _mapper.Map<Role>(roleRequestDto);
+                    role.Id = Guid.NewGuid();
                     var result = _roleManager.CreateAsync(role).Result;
                     if (result.Succeeded)
                     {
@@ -65,7 +66,7 @@ namespace VinotecaFernandez.WebApi.Controllers.Identity
 
         [HttpPut]
         [Route("Update")]
-        public IActionResult Modificar([FromBody] RoleRequestDto roleRequestDto, [FromQuery] Guid id)/*Falta */
+        public IActionResult Modificar([FromBody] RoleRequestDto roleRequestDto, [FromQuery] Guid id)
         {
             if (ModelState.IsValid)
             {
