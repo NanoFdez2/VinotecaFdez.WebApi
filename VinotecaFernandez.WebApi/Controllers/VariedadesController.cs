@@ -33,16 +33,24 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> All()
         {
-            var id = User.FindFirst("Id").Value.ToString();
-            var user = _userManager.FindByIdAsync(id).Result;
-            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
-                await _userManager.IsInRoleAsync(user, "Cliente"))
+            try
             {
-                var name = User.FindFirst("name");
-                var a = User.Claims;
-                return Ok(_mapper.Map<IList<VariedadResponseDto>>(_variedad.GetAll()));
+                var id = User.FindFirst("Id").Value.ToString();
+                var user = _userManager.FindByIdAsync(id).Result;
+                if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                    await _userManager.IsInRoleAsync(user, "Cliente"))
+                {
+                    var name = User.FindFirst("name");
+                    var a = User.Claims;
+                    return Ok(_mapper.Map<IList<VariedadResponseDto>>(_variedad.GetAll()));
+                }
+                return Unauthorized();
             }
-            return Unauthorized();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todas las variedades.");
+                return StatusCode(500, "Ocurrió un error al solicitar.");
+            }
         }
 
         [HttpGet]
@@ -50,65 +58,98 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> ById(int? Id)
         {
-            if (!Id.HasValue)
-                return BadRequest("Debe especificar un Id.");
-
-            var idUser = User.FindFirst("Id")?.Value;
-            var user = await _userManager.FindByIdAsync(idUser);
-
-            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
-                await _userManager.IsInRoleAsync(user, "Cliente"))
+            try
             {
-                var genero = _variedad.GetById(Id.Value);
+                if (!Id.HasValue)
+                    return BadRequest("Debe especificar un Id.");
 
-                if (genero is null)
-                    return NotFound("Variedad no encontrada.");
+                var idUser = User.FindFirst("Id")?.Value;
+                var user = await _userManager.FindByIdAsync(idUser);
 
-                return Ok(_mapper.Map<VariedadResponseDto>(genero));
+                if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                    await _userManager.IsInRoleAsync(user, "Cliente"))
+                {
+                    var genero = _variedad.GetById(Id.Value);
+
+                    if (genero is null)
+                        return NotFound("Variedad no encontrada.");
+
+                    return Ok(_mapper.Map<VariedadResponseDto>(genero));
+                }
+
+                return Unauthorized();
             }
-
-            return Unauthorized();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener la variedad por Id.");
+                return StatusCode(500, "Ocurrió un error al solicitar.");
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear(VariedadRequestDto variedadRequestDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest();
 
-            var variedad = _mapper.Map<Variedad>(variedadRequestDto);
-            _variedad.Save(variedad);
-            return Ok(variedad.Id);
+                var variedad = _mapper.Map<Variedad>(variedadRequestDto);
+                _variedad.Save(variedad);
+                return Ok(variedad.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear la variedad.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
+
         [HttpPut]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Editar(int? Id, VariedadRequestDto variedadRequestDto)
         {
-            if (!Id.HasValue)
-                return BadRequest();
-            if (!ModelState.IsValid)
-                return BadRequest();
+            try
+            {
+                if (!Id.HasValue)
+                    return BadRequest();
+                if (!ModelState.IsValid)
+                    return BadRequest();
 
-            var variedad = _variedad.GetById(Id.Value);
-            if (variedad is null)
-                return NotFound();
+                var variedad = _variedad.GetById(Id.Value);
+                if (variedad is null)
+                    return NotFound();
 
-            variedad = _mapper.Map<Variedad>(variedadRequestDto);
-            _variedad.Save(variedad);
-            return Ok(variedad.Id);
+                variedad = _mapper.Map<Variedad>(variedadRequestDto);
+                _variedad.Save(variedad);
+                return Ok(variedad.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al editar la variedad.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
         [HttpDelete]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Borrar(int? Id)
         {
-            if (!Id.HasValue) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest();
+            try
+            {
+                if (!Id.HasValue) return BadRequest();
+                if (!ModelState.IsValid) return BadRequest();
 
-            Variedad variedadBack = _variedad.GetById(Id.Value);
-            if (variedadBack is null) return NotFound();
-            _variedad.Delete(variedadBack.Id);
-            return Ok();
+                Variedad variedadBack = _variedad.GetById(Id.Value);
+                if (variedadBack is null) return NotFound();
+                _variedad.Delete(variedadBack.Id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al borrar la variedad.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
     }
 }

@@ -36,16 +36,25 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> All()
         {
-            var id = User.FindFirst("Id").Value.ToString();
-            var user = _userManager.FindByIdAsync(id).Result;
-            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
-                await _userManager.IsInRoleAsync(user, "Cliente"))
+            try
             {
-                var name = User.FindFirst("name");
-                var a = User.Claims;
-                return Ok(_mapper.Map<IList<VinoResponseDto>>(_vino.GetAll()));
+                var id = User.FindFirst("Id").Value.ToString();
+                var user = _userManager.FindByIdAsync(id).Result;
+                if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                    await _userManager.IsInRoleAsync(user, "Cliente"))
+                {
+                    var name = User.FindFirst("name");
+                    var a = User.Claims;
+                    return Ok(_mapper.Map<IList<VinoResponseDto>>(_vino.GetAll()));
+                }
+                return Unauthorized();
             }
-            return Unauthorized();
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error al obtener los vinos.");
+                return StatusCode(500, "Ocurrió un error con la solicitud.");
+            }
         }
 
         [HttpGet]
@@ -53,60 +62,92 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> ById(int? Id)
         {
-            if (!Id.HasValue)
-                return BadRequest("Debe especificar un Id.");
-
-            var idUser = User.FindFirst("Id")?.Value;
-            var user = await _userManager.FindByIdAsync(idUser);
-
-            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
-                await _userManager.IsInRoleAsync(user, "Cliente"))
+            try
             {
-                var vino = _vino.GetById(Id.Value);
+                if (!Id.HasValue)
+                    return BadRequest("Debe especificar un Id.");
 
-                if (vino is null)
-                    return NotFound("Vino no encontrado.");
+                var idUser = User.FindFirst("Id")?.Value;
+                var user = await _userManager.FindByIdAsync(idUser);
 
-                return Ok(_mapper.Map<VinoResponseDto>(vino));
+                if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                    await _userManager.IsInRoleAsync(user, "Cliente"))
+                {
+                    var vino = _vino.GetById(Id.Value);
+
+                    if (vino is null)
+                        return NotFound("Vino no encontrado.");
+
+                    return Ok(_mapper.Map<VinoResponseDto>(vino));
+                }
+
+                return Unauthorized();
             }
-
-            return Unauthorized();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener el vino por Id.");
+                return StatusCode(500, "Ocurrió un error con la solicitud.");
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear(VinoRequestDto vinoRequestDto)
         {
-            if (!ModelState.IsValid) return BadRequest();
-            var vino = _mapper.Map<Vino>(vinoRequestDto);
-            _vino.Save(vino);
-            return Ok(vino.Id);
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest();
+                var vino = _mapper.Map<Vino>(vinoRequestDto);
+                _vino.Save(vino);
+                return Ok(vino.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear un vino.");
+                return StatusCode(500, "Ocurrió un error con la solicitud.");
+            }
         }
 
         [HttpPut]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Editar(int? Id, VinoRequestDto vinoRequestDto)
         {
-            if (!Id.HasValue) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest();
-            Vino vinoBack = _vino.GetById(Id.Value);
-            if (vinoBack is null) return NotFound();
+            try
+            {
+                if (!Id.HasValue) return BadRequest();
+                if (!ModelState.IsValid) return BadRequest();
+                Vino vinoBack = _vino.GetById(Id.Value);
+                if (vinoBack is null) return NotFound();
 
-            vinoBack = _mapper.Map<Vino>(vinoRequestDto);
-            _vino.Save(vinoBack);
-            return Ok(vinoBack);
+                vinoBack = _mapper.Map<Vino>(vinoRequestDto);
+                _vino.Save(vinoBack);
+                return Ok(vinoBack);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al editar el vino.");
+                return StatusCode(500, "Ocurrió un error con la solicitud.");
+            }
         }
 
         [HttpDelete]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Borrar(int? Id)
         {
-            if (!Id.HasValue) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest();
-            Vino vinoBack = _vino.GetById(Id.Value);
-            if (vinoBack is null) return NotFound();
-            _vino.Delete(vinoBack.Id);
-            return Ok();
+            try
+            {
+                if (!Id.HasValue) return BadRequest();
+                if (!ModelState.IsValid) return BadRequest();
+                Vino vinoBack = _vino.GetById(Id.Value);
+                if (vinoBack is null) return NotFound();
+                _vino.Delete(vinoBack.Id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al borrar el vino.");
+                return StatusCode(500, "Ocurrió un error con la solicitud.");
+            }
         }
     }
 }

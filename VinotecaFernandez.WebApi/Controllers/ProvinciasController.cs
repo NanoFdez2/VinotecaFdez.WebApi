@@ -58,23 +58,31 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador, Cliente")]
         public async Task<IActionResult> ById(int? Id)
         {
-            if (!Id.HasValue)
-                return BadRequest("Debe especificar un Id.");
-
-            var idUser = User.FindFirst("Id")?.Value;
-            var user = await _userManager.FindByIdAsync(idUser);
-
-            if (await _userManager.IsInRoleAsync(user, "Administrador") ||
-                await _userManager.IsInRoleAsync(user, "Cliente"))
+            try
             {
-                var provincia = _provincia.GetById(Id.Value);
-                if (provincia is null)
-                    return NotFound("Provincia no encontrada.");
+                if (!Id.HasValue)
+                    return BadRequest("Debe especificar un Id.");
 
-                return Ok(_mapper.Map<ProvinciaResponseDto>(provincia));
+                var idUser = User.FindFirst("Id")?.Value;
+                var user = await _userManager.FindByIdAsync(idUser);
+
+                if (await _userManager.IsInRoleAsync(user, "Administrador") ||
+                    await _userManager.IsInRoleAsync(user, "Cliente"))
+                {
+                    var provincia = _provincia.GetById(Id.Value);
+                    if (provincia is null)
+                        return NotFound("Provincia no encontrada.");
+
+                    return Ok(_mapper.Map<ProvinciaResponseDto>(provincia));
+                }
+
+                return Unauthorized();
             }
-
-            return Unauthorized();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener la provincia por Id.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
 
         [HttpPost]
@@ -82,12 +90,20 @@ namespace VinotecaFernandez.WebApi.Controllers
 
         public async Task<IActionResult> Crear(ProvinciaRequestDto provinciaRequestDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest();
 
-            Provincia provincia = _mapper.Map<Provincia>(provinciaRequestDto);
-            _provincia.Save(provincia);
-            return Ok(provincia.Id);
+                Provincia provincia = _mapper.Map<Provincia>(provinciaRequestDto);
+                _provincia.Save(provincia);
+                return Ok(provincia.Id);
+            }
+            catch (Exception ex )
+            {
+                _logger.LogError(ex, "Error al crear la provincia.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
 
 
@@ -95,35 +111,51 @@ namespace VinotecaFernandez.WebApi.Controllers
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Editar(int? Id, ProvinciaRequestDto provinciaRequestDto)
         {
-            if (!Id.HasValue)
-                return BadRequest();
-            if (!ModelState.IsValid)
-                return BadRequest();
+            try
+            {
+                if (!Id.HasValue)
+                    return BadRequest();
+                if (!ModelState.IsValid)
+                    return BadRequest();
 
-            Provincia provinciaBack = _provincia.GetById(Id.Value);
-            if (provinciaBack is null)
-                return NotFound();
+                Provincia provinciaBack = _provincia.GetById(Id.Value);
+                if (provinciaBack is null)
+                    return NotFound();
 
-            provinciaBack = _mapper.Map<Provincia>(provinciaRequestDto);
-            _provincia.Save(provinciaBack);
-            return Ok(provinciaBack);
+                provinciaBack = _mapper.Map<Provincia>(provinciaRequestDto);
+                _provincia.Save(provinciaBack);
+                return Ok(provinciaBack);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al editar la provincia.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
 
         [HttpDelete]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Borrar(int? Id)
         {
-            if (!Id.HasValue)
-                return BadRequest();
-            if (!ModelState.IsValid)
-                return BadRequest();
+            try
+            {
+                if (!Id.HasValue)
+                    return BadRequest();
+                if (!ModelState.IsValid)
+                    return BadRequest();
 
-            Provincia provinciaBack = _provincia.GetById(Id.Value);
-            if (provinciaBack is null)
-                return NotFound();
+                Provincia provinciaBack = _provincia.GetById(Id.Value);
+                if (provinciaBack is null)
+                    return NotFound();
 
-            _provincia.Delete(provinciaBack.Id);
-            return Ok();
+                _provincia.Delete(provinciaBack.Id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al borrar la provincia.");
+                return StatusCode(500, "Ocurrió un error al procesar la solicitud.");
+            }
         }
     }
 }
