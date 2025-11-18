@@ -9,11 +9,11 @@ using Vinoteca.Entities.MicrosoftIdentity;
 
 namespace Vinoteca.DataAccess.MicrosoftIdentity
 {
-    public class UserClamConfiguration : IEntityTypeConfiguration<UserClaim>
+    public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
-        public void Configure(EntityTypeBuilder<UserClaim> builder)
+        public void Configure(EntityTypeBuilder<Role> builder)
         {
-            builder.ToTable(nameof(UserClaim));
+            builder.ToTable(nameof(Role));
         }
     }
 }
