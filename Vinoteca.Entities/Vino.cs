@@ -25,6 +25,7 @@ namespace Vinoteca.Entities
         [ForeignKey(nameof(Bodega))]
         public int BodegaId { get; set; }
         public int Anio { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Precio { get; set; }
         public virtual Bodega Bodegas { get; set; }
         public virtual ICollection<BodegasPorProvincias> BodegasPorProvincias { get; set; }

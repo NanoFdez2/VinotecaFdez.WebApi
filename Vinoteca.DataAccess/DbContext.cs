@@ -39,8 +39,7 @@ namespace Vinoteca.DataAccess
             if (entity is null)
                 throw new ArgumentNullException(nameof(entity));
 
-            // Nuevo comportamiento: usar comparación directa con 0 y manejar el caso en
-            // que la entidad con ese Id no exista en la BD (evitar pasar null a Entry).
+
             if (entity.Id == 0)
             {
                 _Items.Add(entity);
@@ -51,13 +50,12 @@ namespace Vinoteca.DataAccess
 
                 if (entityDb == null)
                 {
-                    // Si no existe en la BD, tratamos como inserción.
-                    // Alternativa: lanzar excepción si prefieres forzar actualización solo cuando exista.
+
                     _Items.Add(entity);
                 }
                 else
                 {
-                    // Desadherir la entidad cargada y actualizar con la enviada
+
                     _ctx.Entry(entityDb).State = EntityState.Detached;
                     _Items.Update(entity);
                 }

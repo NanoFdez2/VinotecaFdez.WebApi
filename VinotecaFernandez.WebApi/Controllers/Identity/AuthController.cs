@@ -65,44 +65,44 @@ namespace VinotecaFernandez.WebApi.Controllers.Identity
             }
         }
 
-        [HttpPost]
-        [Route("RegisterSincronico")]
-        public IActionResult RegistrarUsuarioincronico([FromBody] UserRegistroRequestDto user)
-        {
-            if (ModelState.IsValid)
-            {
-                var existeUsuario = _userManager.FindByEmailAsync(user.Email).Result;
-                if (existeUsuario != null)
-                {
-                    return BadRequest("Existe un usuario registrado con el mal " + user.Email + ".");
-                }
-                var Creado = _userManager.CreateAsync(new User()
-                {
-                    Email = user.Email,
-                    UserName = user.Email.Substring(0, user.Email.IndexOf('@')),
-                    Nombres = user.Nombres,
-                    Apellidos = user.Apellidos,
-                    FechaNacimiento = user.FechaNacimiento
-                }, user.Password).Result;
-                if (Creado.Succeeded)
-                {
-                    return Ok(new UserRegistroResponseDto
-                    {
-                        NombreCompleto = string.Join(" ", user.Nombres, user.Apellidos),
-                        Email = user.Email,
-                        UserName = user.Email.Substring(0, user.Email.IndexOf('@'))
-                    });
-                }
-                else
-                {
-                    return BadRequest(Creado.Errors.Select(e => e.Description).ToList());
-                }
-            }
-            else
-            {
-                return BadRequest("Los datos enviados no son validos.");
-            }
-        }
+        //[HttpPost]
+        //[Route("RegisterSincronico")]
+        //public IActionResult RegistrarUsuarioincronico([FromBody] UserRegistroRequestDto user)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var existeUsuario = _userManager.FindByEmailAsync(user.Email).Result;
+        //        if (existeUsuario != null)
+        //        {
+        //            return BadRequest("Existe un usuario registrado con el mal " + user.Email + ".");
+        //        }
+        //        var Creado = _userManager.CreateAsync(new User()
+        //        {
+        //            Email = user.Email,
+        //            UserName = user.Email.Substring(0, user.Email.IndexOf('@')),
+        //            Nombres = user.Nombres,
+        //            Apellidos = user.Apellidos,
+        //            FechaNacimiento = user.FechaNacimiento
+        //        }, user.Password).Result;
+        //        if (Creado.Succeeded)
+        //        {
+        //            return Ok(new UserRegistroResponseDto
+        //            {
+        //                NombreCompleto = string.Join(" ", user.Nombres, user.Apellidos),
+        //                Email = user.Email,
+        //                UserName = user.Email.Substring(0, user.Email.IndexOf('@'))
+        //            });
+        //        }
+        //        else
+        //        {
+        //            return BadRequest(Creado.Errors.Select(e => e.Description).ToList());
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Los datos enviados no son validos.");
+        //    }
+        //}
 
         [HttpPost]
         [Route("login")]

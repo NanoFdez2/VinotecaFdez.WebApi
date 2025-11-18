@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vinoteca.DataAccess;
 
@@ -11,9 +12,11 @@ using Vinoteca.DataAccess;
 namespace VinotecaFernandez.WebApi.Migrations
 {
     [DbContext(typeof(DbDataAccess))]
-    partial class DbDataAccessModelSnapshot : ModelSnapshot
+    [Migration("20251118214808_18112025")]
+    partial class _18112025
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,7 +46,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bodegas", (string)null);
+                    b.ToTable("Bodegas");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.BodegasPorProvincias", b =>
@@ -74,7 +77,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasIndex("VinoId");
 
-                    b.ToTable("BodegasPorProvincias", (string)null);
+                    b.ToTable("BodegasPorProvincias");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.MicrosoftIdentity.Role", b =>
@@ -301,7 +304,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Provincias", (string)null);
+                    b.ToTable("Provincias");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.Variedad", b =>
@@ -322,7 +325,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Variedades", (string)null);
+                    b.ToTable("Variedades");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.Vino", b =>
@@ -358,7 +361,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasIndex("BodegaId");
 
-                    b.ToTable("Vinos", (string)null);
+                    b.ToTable("Vinos");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.VinosPorBodegas", b =>
@@ -381,7 +384,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasIndex("VinoId");
 
-                    b.ToTable("VinosPorBodegas", (string)null);
+                    b.ToTable("VinosPorBodegas");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.VinosVariedades", b =>
@@ -404,7 +407,7 @@ namespace VinotecaFernandez.WebApi.Migrations
 
                     b.HasIndex("VinoId");
 
-                    b.ToTable("VinosVariedades", (string)null);
+                    b.ToTable("VinosVariedades");
                 });
 
             modelBuilder.Entity("Vinoteca.Entities.BodegasPorProvincias", b =>
