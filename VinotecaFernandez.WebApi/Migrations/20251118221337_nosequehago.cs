@@ -10,7 +10,7 @@ namespace VinotecaFernandez.WebApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameTable(name: "AspNetRoles", newName: "Roles");
+            migrationBuilder.RenameTable(name: "Roles", newName: "AspNetRoles");
         }
 
         /// <inheritdoc />

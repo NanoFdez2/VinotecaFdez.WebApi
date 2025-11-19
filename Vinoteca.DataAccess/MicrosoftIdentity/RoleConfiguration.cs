@@ -9,7 +9,7 @@ using Vinoteca.Entities.MicrosoftIdentity;
 
 namespace Vinoteca.DataAccess.MicrosoftIdentity
 {
-    public class RoleConfiguration : IEntityTypeConfiguration<Role>
+public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {
